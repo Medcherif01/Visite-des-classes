@@ -11,6 +11,7 @@ import { NewEvaluationForm } from './components/NewEvaluationForm';
 import { EvaluationDetailModal } from './components/EvaluationDetailModal';
 import { GridCustomizerModal } from './components/GridCustomizerModal';
 import { LoginModal } from './components/LoginModal';
+import { LoginPage } from './components/LoginPage';
 import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
@@ -55,6 +56,21 @@ export default function App() {
     setCurrentTab(tab);
   };
 
+  // If user is not logged in, render dedicated landing / login page
+  if (!currentUser) {
+    return (
+      <LoginPage
+        onLoginSuccess={user => {
+          setCurrentUser(user);
+          reloadData();
+          setCurrentTab('dashboard');
+        }}
+        lang={lang}
+        onSetLang={handleSetLang}
+      />
+    );
+  }
+
   // If user is a teacher, force or prioritize teacher view
   const isTeacherRole = currentUser?.role === 'teacher';
 
@@ -67,9 +83,8 @@ export default function App() {
         onSelectTab={handleTabChange}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onLogout={() => {
-          storage.setCurrentUser(null);
+          storage.logout();
           setCurrentUser(null);
-          setIsLoginModalOpen(true);
         }}
         isOnline={isOnline}
         syncStats={syncStats}

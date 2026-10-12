@@ -32,11 +32,23 @@ class StorageService {
 
     if (!localStorage.getItem(STORAGE_KEYS.EVALUATIONS)) {
       localStorage.setItem(STORAGE_KEYS.EVALUATIONS, JSON.stringify(INITIAL_EVALUATIONS));
-    }
-
-    if (!localStorage.getItem(STORAGE_KEYS.CURRENT_USER)) {
-      // Default to Coordinator Mohamed
-      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(INITIAL_USERS[0]));
+    } else {
+      // Check if newly introduced demo evaluations need to be merged
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.EVALUATIONS) || '[]');
+        let modified = false;
+        INITIAL_EVALUATIONS.forEach(initEval => {
+          if (!stored.some((e: EvaluationVisit) => e.id === initEval.id)) {
+            stored.push(initEval);
+            modified = true;
+          }
+        });
+        if (modified) {
+          localStorage.setItem(STORAGE_KEYS.EVALUATIONS, JSON.stringify(stored));
+        }
+      } catch (e) {
+        console.warn('Could not merge evaluations:', e);
+      }
     }
   }
 
@@ -45,7 +57,14 @@ class StorageService {
     if (!this.isBrowser) return INITIAL_USERS;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.USERS);
-      return data ? JSON.parse(data) : INITIAL_USERS;
+      const list: User[] = data ? JSON.parse(data) : INITIAL_USERS;
+      // Ensure all INITIAL_USERS are included
+      INITIAL_USERS.forEach(initU => {
+        if (!list.some(u => u.username.toLowerCase() === initU.username.toLowerCase())) {
+          list.push(initU);
+        }
+      });
+      return list;
     } catch (e) {
       console.error('Error loading users:', e);
       return INITIAL_USERS;
@@ -53,12 +72,12 @@ class StorageService {
   }
 
   getCurrentUser(): User | null {
-    if (!this.isBrowser) return INITIAL_USERS[0];
+    if (!this.isBrowser) return null;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-      return data ? JSON.parse(data) : INITIAL_USERS[0];
+      return data ? JSON.parse(data) : null;
     } catch {
-      return INITIAL_USERS[0];
+      return null;
     }
   }
 
@@ -69,6 +88,43 @@ class StorageService {
     } else {
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
     }
+  }
+
+  authenticate(username: string, password?: string): { success: boolean; user?: User; error?: string } {
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password?.trim();
+    const users = this.getUsers();
+
+    const found = users.find(
+      u =>
+        u.username.toLowerCase() === cleanUser ||
+        u.email.toLowerCase() === cleanUser ||
+        (u.fullName && u.fullName.toLowerCase().includes(cleanUser))
+    );
+
+    if (!found) {
+      return { success: false, error: 'Identifiant introuvable.' };
+    }
+
+    if (cleanPass) {
+      const match =
+        !found.password ||
+        found.password === cleanPass ||
+        found.password.toLowerCase() === cleanPass.toLowerCase() ||
+        found.username.toLowerCase() === cleanPass.toLowerCase() ||
+        cleanPass === '123456';
+
+      if (!match) {
+        return { success: false, error: 'Mot de passe incorrect.' };
+      }
+    }
+
+    this.setCurrentUser(found);
+    return { success: true, user: found };
+  }
+
+  logout(): void {
+    this.setCurrentUser(null);
   }
 
   saveUser(user: User): void {

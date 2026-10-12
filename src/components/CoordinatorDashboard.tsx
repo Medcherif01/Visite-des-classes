@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { User, EvaluationVisit, EvaluationGrid, SyncStats } from '../types';
 import { exportEvaluationToPDF } from '../services/pdfGenerator';
+import { downloadEvaluationHTML } from '../services/htmlReportGenerator';
 import {
   PlusCircle,
   Search,
@@ -17,6 +18,7 @@ import {
   Clock,
   Sparkles,
   BookOpen,
+  FileCode,
 } from 'lucide-react';
 
 interface Props {
@@ -91,6 +93,12 @@ export const CoordinatorDashboard: React.FC<Props> = ({
     e.stopPropagation();
     const grid = grids.find(g => g.id === evaluation.gridId) || grids[0];
     exportEvaluationToPDF(evaluation, grid, lang);
+  };
+
+  const handleExportQuickHTML = (e: React.MouseEvent, evaluation: EvaluationVisit) => {
+    e.stopPropagation();
+    const grid = grids.find(g => g.id === evaluation.gridId) || grids[0];
+    downloadEvaluationHTML(evaluation, grid, lang);
   };
 
   return (
@@ -341,6 +349,13 @@ export const CoordinatorDashboard: React.FC<Props> = ({
                   </div>
 
                   <div className="flex items-center gap-1">
+                    <button
+                      onClick={e => handleExportQuickHTML(e, ev)}
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition cursor-pointer"
+                      title="Télécharger l'évaluation sous forme HTML imprimable A4"
+                    >
+                      <FileCode className="w-4 h-4 text-emerald-600" />
+                    </button>
                     <button
                       onClick={e => handleExportQuickPDF(e, ev)}
                       className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition cursor-pointer"

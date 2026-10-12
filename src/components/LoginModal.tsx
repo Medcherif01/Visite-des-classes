@@ -27,17 +27,10 @@ export const LoginModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   const handleManualLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    const res = storage.authenticate(username, password);
 
-    const trimmed = username.trim().toLowerCase();
-    const found = users.find(
-      u => u.username.toLowerCase() === trimmed || u.email.toLowerCase() === trimmed
-    );
-
-    if (found) {
-      storage.setCurrentUser(found);
-      onSuccess(found);
+    if (res.success && res.user) {
+      onSuccess(res.user);
       onClose();
     } else {
       setError(
@@ -45,7 +38,7 @@ export const LoginModal: React.FC<Props> = ({
           ? 'اسم المستخدم أو كلمة المرور غير صحيحة.'
           : lang === 'en'
           ? 'Invalid username or password.'
-          : 'Identifiants non reconnus. Veuillez utiliser un profil existant.'
+          : res.error || 'Identifiant ou mot de passe non reconnu.'
       );
     }
   };

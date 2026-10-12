@@ -6,6 +6,7 @@ export interface User {
   fullName: string;
   role: UserRole;
   email: string;
+  password?: string;
   avatar?: string;
   department?: string;
   assignedTeachers?: string[]; // IDs or names of teachers assigned to coordinator

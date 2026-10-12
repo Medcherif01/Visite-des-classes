@@ -198,25 +198,37 @@ export const Navbar: React.FC<Props> = ({
               </button>
             </div>
 
-            {/* User Session & Role Badge */}
+            {/* User Session & Role Badge & Logout */}
             {currentUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={onOpenLogin}
                   className="flex items-center gap-2 pl-2 pr-2.5 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition cursor-pointer text-left"
-                  title="Changer de compte ou de rôle"
+                  title="Session permanente active • Cliquez pour changer de profil"
                 >
                   <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-xs">
                     {currentUser.username.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="hidden sm:flex flex-col">
-                    <span className="text-xs font-bold text-slate-800 leading-tight">
-                      {currentUser.username}
+                    <span className="text-xs font-bold text-slate-800 leading-tight flex items-center gap-1">
+                      <span>{currentUser.username}</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Connecté en continu"></span>
                     </span>
                     <span className="text-[10px] text-slate-500 leading-tight">
-                      {roleInfo.label}
+                      {roleInfo.label} • Permanent
                     </span>
                   </div>
+                </button>
+
+                <button
+                  onClick={onLogout}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:text-red-700 hover:border-red-200 hover:bg-red-50 transition cursor-pointer text-xs font-semibold"
+                  title={lang === 'ar' ? 'تسجيل الخروج وإنهاء الجلسة الدائمة' : 'Déconnexion (Terminer la session permanente)'}
+                >
+                  <LogOut className="w-3.5 h-3.5 text-slate-500 hover:text-red-600" />
+                  <span className="hidden md:inline">
+                    {lang === 'ar' ? 'خروج' : 'Déconnexion'}
+                  </span>
                 </button>
               </div>
             ) : (
