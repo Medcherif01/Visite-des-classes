@@ -58,12 +58,21 @@ class StorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.USERS);
       const list: User[] = data ? JSON.parse(data) : INITIAL_USERS;
+
       // Ensure all INITIAL_USERS are included
       INITIAL_USERS.forEach(initU => {
-        if (!list.some(u => u.username.toLowerCase() === initU.username.toLowerCase())) {
+        const existing = list.find(u => u.username.toLowerCase() === initU.username.toLowerCase());
+        if (!existing) {
           list.push(initU);
+        } else {
+          // Keep credentials and role up to date for key accounts like Mohamed
+          if (initU.username.toLowerCase() === 'mohamed') {
+            existing.role = 'admin';
+            existing.password = 'Mohamed@86';
+          }
         }
       });
+
       return list;
     } catch (e) {
       console.error('Error loading users:', e);
@@ -75,7 +84,15 @@ class StorageService {
     if (!this.isBrowser) return null;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-      return data ? JSON.parse(data) : null;
+      if (!data) return null;
+      const user: User = JSON.parse(data);
+      // Ensure Mohamed is always recognized as admin
+      if (user.username.toLowerCase() === 'mohamed' && user.role !== 'admin') {
+        user.role = 'admin';
+        user.password = 'Mohamed@86';
+        this.setCurrentUser(user);
+      }
+      return user;
     } catch {
       return null;
     }
@@ -136,6 +153,63 @@ class StorageService {
       users.push(user);
     }
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+  }
+
+  addUser(userData: {
+    username: string;
+    password: string;
+    fullName: string;
+    department?: string;
+    email?: string;
+    role?: 'teacher' | 'coordinator' | 'admin';
+  }): { success: boolean; user?: User; error?: string } {
+    const cleanUsername = userData.username.trim();
+    if (!cleanUsername) {
+      return { success: false, error: 'Le nom d\'utilisateur (login) est obligatoire.' };
+    }
+
+    const cleanPass = userData.password.trim();
+    if (!cleanPass) {
+      return { success: false, error: 'Le mot de passe est obligatoire.' };
+    }
+
+    const users = this.getUsers();
+    const alreadyExists = users.some(
+      u => u.username.toLowerCase() === cleanUsername.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      return {
+        success: false,
+        error: `Un utilisateur avec l'identifiant "${cleanUsername}" existe déjà. Veuillez en choisir un autre.`,
+      };
+    }
+
+    const newUser: User = {
+      id: `user-teach-${Date.now()}`,
+      username: cleanUsername,
+      password: cleanPass,
+      fullName: userData.fullName.trim() || `Prof. ${cleanUsername}`,
+      role: userData.role || 'teacher',
+      email: userData.email?.trim() || `${cleanUsername.toLowerCase()}@ecole-alkawthar.edu`,
+      department: userData.department?.trim() || 'Enseignement Secondaire & Collège',
+    };
+
+    users.push(newUser);
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    return { success: true, user: newUser };
+  }
+
+  deleteUser(userId: string): boolean {
+    const users = this.getUsers();
+    const target = users.find(u => u.id === userId);
+    // Protect admin Mohamed from deletion
+    if (target && target.username.toLowerCase() === 'mohamed') {
+      return false;
+    }
+    const filtered = users.filter(u => u.id !== userId);
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filtered));
+    return true;
   }
 
   // --- Evaluation Grids (Customizable) ---

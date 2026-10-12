@@ -139,6 +139,20 @@ export const Navbar: React.FC<Props> = ({
               </button>
             )}
 
+            {currentUser?.role !== 'teacher' && (
+              <button
+                onClick={() => onSelectTab('teachers')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
+                  currentTab === 'teachers'
+                    ? 'bg-emerald-50 text-emerald-800 font-bold'
+                    : 'hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                <Users className="w-4 h-4 text-emerald-600" />
+                <span>{lang === 'ar' ? 'إدارة المعلمين' : lang === 'en' ? 'Teachers & Access' : 'Enseignants & Accès'}</span>
+              </button>
+            )}
+
             <button
               onClick={() => onSelectTab('grids')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors whitespace-nowrap cursor-pointer ${

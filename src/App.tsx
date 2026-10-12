@@ -12,11 +12,13 @@ import { EvaluationDetailModal } from './components/EvaluationDetailModal';
 import { GridCustomizerModal } from './components/GridCustomizerModal';
 import { LoginModal } from './components/LoginModal';
 import { LoginPage } from './components/LoginPage';
+import { TeacherManagement } from './components/TeacherManagement';
 import { MobileBottomNav } from './components/MobileBottomNav';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(() => storage.getCurrentUser());
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'new-evaluation' | 'grids' | 'teachers' | 'analytics'>('dashboard');
+  const [selectedTeacherForEval, setSelectedTeacherForEval] = useState<string | undefined>(undefined);
   const [evaluations, setEvaluations] = useState<EvaluationVisit[]>(() => storage.getEvaluations());
   const [grids, setGrids] = useState<EvaluationGrid[]>(() => storage.getGrids());
   const [activeEvaluationDetail, setActiveEvaluationDetail] = useState<EvaluationVisit | null>(null);
@@ -108,8 +110,26 @@ export default function App() {
         {currentTab === 'new-evaluation' && !isTeacherRole ? (
           <NewEvaluationForm
             currentUser={currentUser}
-            onSaveSuccess={handleSaveEvaluationSuccess}
-            onCancel={() => setCurrentTab('dashboard')}
+            onSaveSuccess={ev => {
+              setSelectedTeacherForEval(undefined);
+              handleSaveEvaluationSuccess(ev);
+            }}
+            onCancel={() => {
+              setSelectedTeacherForEval(undefined);
+              setCurrentTab('dashboard');
+            }}
+            lang={lang}
+            initialTeacherName={selectedTeacherForEval}
+          />
+        ) : currentTab === 'teachers' && !isTeacherRole ? (
+          <TeacherManagement
+            users={storage.getUsers()}
+            evaluations={evaluations}
+            onRefresh={reloadData}
+            onStartEvaluationForTeacher={teacherName => {
+              setSelectedTeacherForEval(teacherName);
+              setCurrentTab('new-evaluation');
+            }}
             lang={lang}
           />
         ) : currentTab === 'analytics' && currentUser?.role === 'admin' ? (
@@ -133,7 +153,10 @@ export default function App() {
             currentUser={currentUser}
             evaluations={evaluations}
             grids={grids}
-            onStartNewEvaluation={() => setCurrentTab('new-evaluation')}
+            onStartNewEvaluation={() => {
+              setSelectedTeacherForEval(undefined);
+              setCurrentTab('new-evaluation');
+            }}
             onOpenEvaluationDetail={ev => setActiveEvaluationDetail(ev)}
             onOpenGridCustomizer={() => setIsGridCustomizerOpen(true)}
             onDeleteEvaluation={handleDeleteEvaluation}

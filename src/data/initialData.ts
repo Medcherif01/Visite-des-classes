@@ -2,14 +2,14 @@ import { User, EvaluationVisit } from '../types';
 
 export const INITIAL_USERS: User[] = [
   {
-    id: 'user-coord-1',
+    id: 'user-admin-mohamed',
     username: 'Mohamed',
     password: 'Mohamed@86',
     fullName: 'M. Mohamed Cherif',
-    role: 'coordinator',
+    role: 'admin',
     email: 'mohamed.cherif@ecole-alkawthar.edu',
-    department: 'Coordination Scientifique & Mathématiques',
-    assignedTeachers: ['Morched', 'Kamel', 'Abas', 'Zine', 'Youssef', 'Sami', 'Mohamed Ali', 'Sylvano'],
+    department: 'Direction Pédagogique, Inspection & Coordination',
+    assignedTeachers: ['Morched', 'Kamel', 'Abas', 'Amal', 'نداء اللقماني', 'Zine', 'Youssef', 'Sami'],
   },
   {
     id: 'user-coord-2',

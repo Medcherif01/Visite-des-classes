@@ -80,9 +80,18 @@ export const LoginPage: React.FC<Props> = ({
   };
 
   // Group demo accounts
+  const adminMohamed = users.find(u => u.username.toLowerCase() === 'mohamed') || {
+    id: 'user-admin-mohamed',
+    username: 'Mohamed',
+    password: 'Mohamed@86',
+    fullName: 'M. Mohamed Cherif',
+    role: 'admin' as const,
+    email: 'mohamed.cherif@ecole-alkawthar.edu',
+    department: 'Direction Pédagogique & Inspection',
+  };
   const coordinators = users.filter(u => u.role === 'coordinator');
   const teachers = users.filter(u => u.role === 'teacher');
-  const admin = users.find(u => u.role === 'admin');
+  const admin = users.find(u => u.role === 'admin' && u.username.toLowerCase() !== 'mohamed');
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900">
@@ -296,13 +305,47 @@ export const LoginPage: React.FC<Props> = ({
                 </span>
               </div>
 
+              {/* Admin Mohamed (Principal Administrator) */}
+              <div>
+                <span className="text-[10px] font-bold text-blue-900 uppercase block mb-1.5 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-700"></span>
+                  <span>Administrateur Principal (Ajout d'enseignants & Visites) :</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin(adminMohamed)}
+                  className="w-full text-left p-3 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/50 to-blue-50 hover:from-blue-100 hover:to-indigo-100 text-blue-950 border-2 border-blue-300 transition cursor-pointer flex items-center justify-between group shadow-xs"
+                >
+                  <div className="space-y-0.5">
+                    <div className="font-extrabold text-xs sm:text-sm text-blue-950 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0" />
+                      <span>Admin Mohamed (M. Mohamed Cherif)</span>
+                      <span className="text-[10px] bg-blue-700 text-white px-2 py-0.5 rounded-full font-bold">
+                        Admin
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-blue-800 font-mono flex flex-wrap gap-x-3">
+                      <span>login : <b className="text-slate-950">Mohamed</b></span>
+                      <span>•</span>
+                      <span>mot de passe : <b className="text-slate-950">Mohamed@86</b></span>
+                    </div>
+                    <div className="text-[10px] text-blue-700/80">
+                      Ajout d'enseignants avec login/mot de passe • Visites en direct • Grilles personnalisables
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-xl shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                    Connexion Admin ➜
+                  </span>
+                </button>
+              </div>
+
               {/* Teachers */}
               <div>
                 <span className="text-[10px] font-bold text-emerald-800 uppercase block mb-1.5 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                   <span>Enseignants (Accès direct à leurs notes, commentaires & impression) :</span>
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
                   {teachers.map(t => (
                     <button
                       key={t.id}
@@ -327,54 +370,28 @@ export const LoginPage: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* Coordinators */}
-              <div>
-                <span className="text-[10px] font-bold text-blue-800 uppercase block mb-1.5 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                  <span>Coordinateurs Pédagogiques (Visites de classe & Grilles) :</span>
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
-                  {coordinators.slice(0, 3).map(c => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => handleQuickLogin(c)}
-                      className="text-left px-2 py-1.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/90 text-blue-900 border border-blue-200/80 transition cursor-pointer group"
-                    >
-                      <div className="font-bold text-xs group-hover:text-blue-950">
-                        Coord. {c.username}
-                      </div>
-                      <div className="text-[10px] text-blue-700/80 font-mono">
-                        pass: <b>{c.password || '123456'}</b>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Admin */}
-              {admin && (
+              {/* Other Coordinators */}
+              {coordinators.filter(c => c.username.toLowerCase() !== 'mohamed').length > 0 && (
                 <div>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin(admin)}
-                    className="w-full text-left px-3 py-1.5 rounded-xl bg-purple-50/70 hover:bg-purple-100/90 text-purple-900 border border-purple-200/80 transition cursor-pointer flex items-center justify-between group"
-                  >
-                    <div>
-                      <div className="font-bold text-xs group-hover:text-purple-950">
-                        Direction Pédagogique & Inspection (Dr. Karima Alami)
-                      </div>
-                      <div className="text-[10px] text-purple-700 font-mono">
-                        login: <b>Admin</b> • pass: <b>{admin.password || 'Admin@2026'}</b>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold bg-white text-purple-700 px-2 py-0.5 rounded-md border border-purple-200 shrink-0">
-                      Entrer ➜
-                    </span>
-                  </button>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                    Autres Coordinateurs Pédagogiques :
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {coordinators.filter(c => c.username.toLowerCase() !== 'mohamed').slice(0, 3).map(c => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => handleQuickLogin(c)}
+                        className="text-left px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition cursor-pointer"
+                      >
+                        Coord. {c.username} ({c.password || '123456'})
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </main>

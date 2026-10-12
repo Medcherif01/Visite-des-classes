@@ -30,6 +30,7 @@ interface Props {
   onSaveSuccess: (evaluation: EvaluationVisit) => void;
   onCancel: () => void;
   lang: 'fr' | 'ar' | 'en';
+  initialTeacherName?: string;
 }
 
 export const NewEvaluationForm: React.FC<Props> = ({
@@ -37,6 +38,7 @@ export const NewEvaluationForm: React.FC<Props> = ({
   onSaveSuccess,
   onCancel,
   lang,
+  initialTeacherName,
 }) => {
   const grids = useMemo(() => storage.getGrids(), []);
   const allUsers = useMemo(() => storage.getUsers(), []);
@@ -50,7 +52,7 @@ export const NewEvaluationForm: React.FC<Props> = ({
   );
 
   const [teacherName, setTeacherName] = useState<string>(
-    currentUser?.assignedTeachers?.[0] || teachers[0]?.username || 'Morched'
+    initialTeacherName || currentUser?.assignedTeachers?.[0] || teachers[0]?.username || 'Morched'
   );
   const [className, setClassName] = useState<string>('3ème B');
   const [subject, setSubject] = useState<string>('Mathématiques');

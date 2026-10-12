@@ -53,6 +53,20 @@ export const MobileBottomNav: React.FC<Props> = ({
         </button>
       )}
 
+      {currentUser?.role !== 'teacher' && (
+        <button
+          onClick={() => onSelectTab('teachers')}
+          className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition cursor-pointer min-w-[56px] ${
+            currentTab === 'teachers' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+          }`}
+        >
+          <Award className="w-5 h-5" />
+          <span className="text-[10px] mt-0.5">
+            {lang === 'ar' ? 'المعلمين' : 'Profs'}
+          </span>
+        </button>
+      )}
+
       <button
         onClick={() => onSelectTab('grids')}
         className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition cursor-pointer min-w-[56px] ${
