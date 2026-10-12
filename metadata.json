@@ -1,0 +1,6 @@
+{
+  "name": "EduVisite - Évaluation Pédagogique & Visites de Classe",
+  "description": "Plateforme d'évaluation pédagogique pour coordinateurs et inspecteurs. Grilles personnalisables, suivi en temps réel, génération automatique de synthèses, export PDF officiel et mode déconnecté synchronisable pour tablettes et mobiles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
