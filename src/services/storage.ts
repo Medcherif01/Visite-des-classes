@@ -379,6 +379,8 @@ class StorageService {
       evaluations: this.getEvaluations(),
       grids: this.getGrids(),
       users: this.getUsers(),
+      classes: this.getClasses(),
+      subjects: this.getSubjects(),
     };
     return JSON.stringify(backup, null, 2);
   }
@@ -395,11 +397,73 @@ class StorageService {
       if (data.users && Array.isArray(data.users)) {
         localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(data.users));
       }
+      if (data.classes && Array.isArray(data.classes)) {
+        localStorage.setItem('eduvisite_classes_v1', JSON.stringify(data.classes));
+      }
+      if (data.subjects && Array.isArray(data.subjects)) {
+        localStorage.setItem('eduvisite_subjects_v1', JSON.stringify(data.subjects));
+      }
       return true;
     } catch (e) {
       console.error('Failed to parse backup:', e);
       return false;
     }
+  }
+
+  // --- Classes Management ---
+  getClasses(): string[] {
+    if (!this.isBrowser) return ['3ème A (Collège)', '3ème B (Collège)', 'CM2 A (Cycle 3)', '1ère Scientifique S2', 'Grande Section (Maternelle)'];
+    try {
+      const data = localStorage.getItem('eduvisite_classes_v1');
+      return data ? JSON.parse(data) : ['3ème A (Collège)', '3ème B (Collège)', 'CM2 A (Cycle 3)', '1ère Scientifique S2', 'Grande Section (Maternelle)', '6ème A (Collège)'];
+    } catch {
+      return ['3ème A (Collège)', '3ème B (Collège)', 'CM2 A (Cycle 3)', '1ère Scientifique S2', 'Grande Section (Maternelle)'];
+    }
+  }
+
+  addClass(className: string): boolean {
+    const trimmed = className.trim();
+    if (!trimmed) return false;
+    const list = this.getClasses();
+    if (list.includes(trimmed)) return false;
+    list.push(trimmed);
+    localStorage.setItem('eduvisite_classes_v1', JSON.stringify(list));
+    return true;
+  }
+
+  deleteClass(className: string): boolean {
+    const list = this.getClasses();
+    const filtered = list.filter(c => c !== className);
+    localStorage.setItem('eduvisite_classes_v1', JSON.stringify(filtered));
+    return true;
+  }
+
+  // --- Subjects Management ---
+  getSubjects(): string[] {
+    if (!this.isBrowser) return ['Mathématiques', 'Français', 'Physique-Chimie', 'Sciences de la Vie et de la Terre', 'Langue Arabe', 'Anglais'];
+    try {
+      const data = localStorage.getItem('eduvisite_subjects_v1');
+      return data ? JSON.parse(data) : ['Mathématiques', 'Français', 'Physique-Chimie', 'Sciences de la Vie et de la Terre', 'Langue Arabe', 'Anglais', 'Histoire-Géographie', 'Éveil Sensoriel'];
+    } catch {
+      return ['Mathématiques', 'Français', 'Physique-Chimie', 'Sciences de la Vie et de la Terre', 'Langue Arabe', 'Anglais'];
+    }
+  }
+
+  addSubject(subjectName: string): boolean {
+    const trimmed = subjectName.trim();
+    if (!trimmed) return false;
+    const list = this.getSubjects();
+    if (list.includes(trimmed)) return false;
+    list.push(trimmed);
+    localStorage.setItem('eduvisite_subjects_v1', JSON.stringify(list));
+    return true;
+  }
+
+  deleteSubject(subjectName: string): boolean {
+    const list = this.getSubjects();
+    const filtered = list.filter(s => s !== subjectName);
+    localStorage.setItem('eduvisite_subjects_v1', JSON.stringify(filtered));
+    return true;
   }
 }
 

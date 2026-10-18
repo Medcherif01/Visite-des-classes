@@ -43,6 +43,8 @@ export const NewEvaluationForm: React.FC<Props> = ({
   const grids = useMemo(() => storage.getGrids(), []);
   const allUsers = useMemo(() => storage.getUsers(), []);
   const teachers = useMemo(() => allUsers.filter(u => u.role === 'teacher'), [allUsers]);
+  const classesList = useMemo(() => storage.getClasses(), []);
+  const subjectsList = useMemo(() => storage.getSubjects(), []);
 
   // Form State
   const [selectedGridId, setSelectedGridId] = useState<string>(grids[0]?.id || '');
@@ -54,8 +56,8 @@ export const NewEvaluationForm: React.FC<Props> = ({
   const [teacherName, setTeacherName] = useState<string>(
     initialTeacherName || currentUser?.assignedTeachers?.[0] || teachers[0]?.username || 'Morched'
   );
-  const [className, setClassName] = useState<string>('3ème B');
-  const [subject, setSubject] = useState<string>('Mathématiques');
+  const [className, setClassName] = useState<string>(classesList[0] || '3ème B');
+  const [subject, setSubject] = useState<string>(subjectsList[0] || 'Mathématiques');
   const [lessonTopic, setLessonTopic] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [sessionNumber, setSessionNumber] = useState<number>(2);
@@ -550,14 +552,18 @@ export const NewEvaluationForm: React.FC<Props> = ({
               <label className="block font-semibold text-slate-700 mb-1">
                 {lang === 'ar' ? 'القسم / الصف' : lang === 'en' ? 'Class' : 'Classe / Niveau'} *
               </label>
-              <input
-                type="text"
+              <select
                 value={className}
                 onChange={e => setClassName(e.target.value)}
-                placeholder="Ex: 3ème B, CM2 A, KG2..."
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:outline-hidden focus:border-blue-600"
                 required
-              />
+              >
+                {classesList.map(cls => (
+                  <option key={cls} value={cls}>
+                    {cls}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Subject */}
@@ -565,14 +571,18 @@ export const NewEvaluationForm: React.FC<Props> = ({
               <label className="block font-semibold text-slate-700 mb-1">
                 {lang === 'ar' ? 'المادة الدراسية' : lang === 'en' ? 'Subject' : 'Matière / Discipline'} *
               </label>
-              <input
-                type="text"
+              <select
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
-                placeholder="Ex: Mathématiques, Français..."
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:outline-hidden focus:border-blue-600"
                 required
-              />
+              >
+                {subjectsList.map(subj => (
+                  <option key={subj} value={subj}>
+                    {subj}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Date */}

@@ -324,13 +324,8 @@ export const LoginPage: React.FC<Props> = ({
                         Admin
                       </span>
                     </div>
-                    <div className="text-[11px] text-blue-800 font-mono flex flex-wrap gap-x-3">
-                      <span>login : <b className="text-slate-950">Mohamed</b></span>
-                      <span>•</span>
-                      <span>mot de passe : <b className="text-slate-950">Mohamed@86</b></span>
-                    </div>
                     <div className="text-[10px] text-blue-700/80">
-                      Ajout d'enseignants avec login/mot de passe • Visites en direct • Grilles personnalisables
+                      Ajout d'enseignants • Visites en direct • Gestion des classes et matières • Grilles personnalisables
                     </div>
                   </div>
                   <span className="text-xs font-bold bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-xl shadow-xs shrink-0 group-hover:scale-105 transition-transform">
