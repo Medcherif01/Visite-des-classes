@@ -102,7 +102,7 @@ Génère en JSON les commentaires complets d'inspection pour cette fiche d'éval
 5. "actionPlan" : Plan d'action et engagements mutuels pour la prochaine visite convenue.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         systemInstruction,
