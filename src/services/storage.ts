@@ -57,21 +57,18 @@ class StorageService {
     if (!this.isBrowser) return INITIAL_USERS;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.USERS);
-      const list: User[] = data ? JSON.parse(data) : INITIAL_USERS;
+      if (!data) {
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
+        return INITIAL_USERS;
+      }
+      const list: User[] = JSON.parse(data);
 
-      // Ensure all INITIAL_USERS are included
-      INITIAL_USERS.forEach(initU => {
-        const existing = list.find(u => u.username.toLowerCase() === initU.username.toLowerCase());
-        if (!existing) {
-          list.push(initU);
-        } else {
-          // Keep credentials and role up to date for key accounts like Mohamed
-          if (initU.username.toLowerCase() === 'mohamed') {
-            existing.role = 'admin';
-            existing.password = 'Mohamed@86';
-          }
-        }
-      });
+      // Ensure Mohamed is always admin
+      const mohamed = list.find(u => u.username.toLowerCase() === 'mohamed');
+      if (mohamed) {
+        mohamed.role = 'admin';
+        mohamed.password = 'Mohamed@86';
+      }
 
       return list;
     } catch (e) {
@@ -196,6 +193,17 @@ class StorageService {
     };
 
     users.push(newUser);
+
+    // Also add to assignedTeachers of admin/coordinator accounts
+    users.forEach(u => {
+      if ((u.role === 'admin' || u.role === 'coordinator') && newUser.role === 'teacher') {
+        if (!u.assignedTeachers) u.assignedTeachers = [];
+        if (!u.assignedTeachers.includes(newUser.username)) {
+          u.assignedTeachers.push(newUser.username);
+        }
+      }
+    });
+
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
     return { success: true, user: newUser };
   }
@@ -208,6 +216,18 @@ class StorageService {
       return false;
     }
     const filtered = users.filter(u => u.id !== userId);
+
+    // Also remove from assignedTeachers across all users
+    if (target) {
+      filtered.forEach(u => {
+        if (u.assignedTeachers) {
+          u.assignedTeachers = u.assignedTeachers.filter(
+            tName => tName.toLowerCase() !== target.username.toLowerCase() && tName !== target.fullName
+          );
+        }
+      });
+    }
+
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filtered));
     return true;
   }

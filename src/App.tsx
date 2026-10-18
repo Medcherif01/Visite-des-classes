@@ -21,6 +21,7 @@ export default function App() {
   const [selectedTeacherForEval, setSelectedTeacherForEval] = useState<string | undefined>(undefined);
   const [evaluations, setEvaluations] = useState<EvaluationVisit[]>(() => storage.getEvaluations());
   const [grids, setGrids] = useState<EvaluationGrid[]>(() => storage.getGrids());
+  const [users, setUsers] = useState<User[]>(() => storage.getUsers());
   const [activeEvaluationDetail, setActiveEvaluationDetail] = useState<EvaluationVisit | null>(null);
   const [isGridCustomizerOpen, setIsGridCustomizerOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function App() {
   const reloadData = useCallback(() => {
     setEvaluations(storage.getEvaluations());
     setGrids(storage.getGrids());
+    setUsers(storage.getUsers());
     refreshSyncStats();
   }, [refreshSyncStats]);
 
@@ -123,7 +125,7 @@ export default function App() {
           />
         ) : currentTab === 'teachers' && !isTeacherRole ? (
           <TeacherManagement
-            users={storage.getUsers()}
+            users={users}
             evaluations={evaluations}
             onRefresh={reloadData}
             onStartEvaluationForTeacher={teacherName => {
@@ -136,7 +138,7 @@ export default function App() {
           <AdminDashboard
             evaluations={evaluations}
             grids={grids}
-            users={storage.getUsers()}
+            users={users}
             onRefresh={reloadData}
             lang={lang}
           />
